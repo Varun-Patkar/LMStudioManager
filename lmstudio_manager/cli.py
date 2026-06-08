@@ -333,8 +333,90 @@ class LMStudioTrayApp:
     # UI and tray
     # ------------------------------------------------------------------
 
+    def _apply_theme(self) -> None:
+        """Apply a dark colour theme to the app."""
+        BG = "#1e232a"
+        FG = "#e0e4ea"
+        ACCENT = "#2284e6"
+        ACCENT_HOVER = "#3a9af5"
+        FIELD_BG = "#282e38"
+        TREE_BG = "#22272e"
+        TREE_SEL = "#2a4a6e"
+        HEADING_BG = "#2a3040"
+        GREEN = "#2ea043"
+        GREEN_FG = "#c8f7d0"
+        AMBER = "#d29922"
+        RED = "#da3633"
+
+        self.root.configure(bg=BG)
+
+        style = ttk.Style(self.root)
+        style.theme_use("clam")
+
+        style.configure(".", background=BG, foreground=FG, fieldbackground=FIELD_BG,
+                        bordercolor=BG, troughcolor=FIELD_BG, font=("Segoe UI", 10))
+        style.configure("TFrame", background=BG)
+        style.configure("TLabel", background=BG, foreground=FG, font=("Segoe UI", 10))
+        style.configure("TEntry", fieldbackground=FIELD_BG, foreground=FG,
+                        insertcolor=FG)
+
+        # Accent button
+        style.configure("Accent.TButton", background=ACCENT, foreground="#ffffff",
+                        font=("Segoe UI", 10, "bold"), padding=(12, 6))
+        style.map("Accent.TButton",
+                  background=[("active", ACCENT_HOVER), ("pressed", ACCENT)],
+                  foreground=[("disabled", "#888")])
+
+        # Green button (load)
+        style.configure("Green.TButton", background=GREEN, foreground="#ffffff",
+                        font=("Segoe UI", 10, "bold"), padding=(12, 6))
+        style.map("Green.TButton",
+                  background=[("active", "#3cb653"), ("pressed", GREEN)])
+
+        # Red button (unload)
+        style.configure("Red.TButton", background=RED, foreground="#ffffff",
+                        font=("Segoe UI", 10, "bold"), padding=(12, 6))
+        style.map("Red.TButton",
+                  background=[("active", "#e5534b"), ("pressed", RED)])
+
+        # Amber button (warmup)
+        style.configure("Amber.TButton", background=AMBER, foreground="#ffffff",
+                        font=("Segoe UI", 10, "bold"), padding=(12, 6))
+        style.map("Amber.TButton",
+                  background=[("active", "#e0a82e"), ("pressed", AMBER)])
+
+        # Default button style
+        style.configure("TButton", background="#3d444d", foreground=FG,
+                        font=("Segoe UI", 10), padding=(12, 6))
+        style.map("TButton",
+                  background=[("active", "#4a535e"), ("pressed", "#3d444d")])
+
+        # Treeview
+        style.configure("Treeview", background=TREE_BG, foreground=FG,
+                        fieldbackground=TREE_BG, rowheight=28,
+                        font=("Segoe UI", 10))
+        style.configure("Treeview.Heading", background=HEADING_BG,
+                        foreground="#ffffff", font=("Segoe UI", 10, "bold"),
+                        relief="flat")
+        style.map("Treeview",
+                  background=[("selected", TREE_SEL)],
+                  foreground=[("selected", "#ffffff")])
+        style.map("Treeview.Heading",
+                  background=[("active", "#354060")])
+
+        # Status label
+        style.configure("Status.TLabel", background="#282e38", foreground="#8b949e",
+                        font=("Segoe UI", 9), padding=(8, 4))
+
+        # Store colours for row tags
+        self._colors = {
+            "green": GREEN, "green_fg": GREEN_FG,
+            "tree_bg": TREE_BG, "fg": FG,
+        }
+
     def _build_ui(self) -> None:
         """Build main management window widgets."""
+        self._apply_theme()
         self.root.minsize(920, 500)
 
         wrapper = ttk.Frame(self.root, padding=10)
@@ -343,22 +425,21 @@ class LMStudioTrayApp:
         top = ttk.Frame(wrapper)
         top.pack(fill=tk.X)
 
-        ttk.Button(top, text="Refresh", command=self.refresh).pack(side=tk.LEFT)
-        ttk.Button(top, text="Load Selected", command=self.load_selected).pack(
-            side=tk.LEFT, padx=(8, 0)
-        )
-        ttk.Button(top, text="Unload Loaded", command=self.unload_loaded).pack(
-            side=tk.LEFT, padx=(8, 0)
-        )
-        ttk.Button(top, text="Warmup Loaded", command=self.warmup_loaded).pack(
-            side=tk.LEFT, padx=(8, 0)
-        )
+        ttk.Button(top, text="⟳ Refresh", style="Accent.TButton",
+                   command=self.refresh).pack(side=tk.LEFT)
+        ttk.Button(top, text="▶ Load Selected", style="Green.TButton",
+                   command=self.load_selected).pack(side=tk.LEFT, padx=(8, 0))
+        ttk.Button(top, text="■ Unload", style="Red.TButton",
+                   command=self.unload_loaded).pack(side=tk.LEFT, padx=(8, 0))
+        ttk.Button(top, text="☄ Warmup", style="Amber.TButton",
+                   command=self.warmup_loaded).pack(side=tk.LEFT, padx=(8, 0))
         ttk.Button(top, text="Hide To Tray", command=self._hide_window).pack(
             side=tk.RIGHT
         )
 
         columns = ("status", "key", "name", "quant", "size", "context")
-        tree = ttk.Treeview(wrapper, columns=columns, show="headings", height=16)
+        tree = ttk.Treeview(wrapper, columns=columns, show="headings", height=16,
+                            selectmode="browse")
         self.tree = tree
 
         tree.heading("status", text="Status")
@@ -375,11 +456,22 @@ class LMStudioTrayApp:
         tree.column("size", width=90, anchor=tk.E)
         tree.column("context", width=190, anchor=tk.E)
 
-        tree.pack(fill=tk.BOTH, expand=True, pady=(10, 8))
+        # Row tags for loaded (green) vs idle
+        tree.tag_configure("loaded", background=self._colors["green"],
+                           foreground=self._colors["green_fg"])
+        tree.tag_configure("idle", background=self._colors["tree_bg"],
+                           foreground=self._colors["fg"])
+
         tree.bind("<<TreeviewSelect>>", self._on_select)
 
+        # Pack bottom bar and status BEFORE tree so they are never clipped
+        # when the window is shrunk vertically.
         bottom = ttk.Frame(wrapper)
-        bottom.pack(fill=tk.X, pady=(4, 0))
+        bottom.pack(side=tk.BOTTOM, fill=tk.X, pady=(4, 0))
+
+        status = ttk.Label(wrapper, textvariable=self.status_var, anchor=tk.W,
+                           style="Status.TLabel")
+        status.pack(side=tk.BOTTOM, fill=tk.X, pady=(8, 0))
 
         ttk.Label(bottom, text="Selected Model:").pack(side=tk.LEFT)
         ttk.Label(bottom, textvariable=self.selected_key_var).pack(side=tk.LEFT, padx=(6, 20))
@@ -393,8 +485,8 @@ class LMStudioTrayApp:
             side=tk.LEFT, padx=(8, 0)
         )
 
-        status = ttk.Label(wrapper, textvariable=self.status_var, anchor=tk.W)
-        status.pack(fill=tk.X, pady=(8, 0))
+        # Tree fills remaining space — packed last so it shrinks first
+        tree.pack(fill=tk.BOTH, expand=True, pady=(10, 8))
 
     def _create_tray_icon(self) -> None:
         """Create and run tray icon in detached mode."""
@@ -467,17 +559,20 @@ class LMStudioTrayApp:
             insts = m.get("loaded_instances", [])
             if insts:
                 loaded_ctx = int(insts[0].get("config", {}).get("context_length", max_ctx) or max_ctx)
-                status = "LOADED"
+                status = "✅ LOADED"
                 ctx = f"{loaded_ctx:,} (loaded)"
+                row_tag = "loaded"
             else:
-                status = "-"
+                status = "—"
                 if pref_ctx == max_ctx:
                     ctx = f"{pref_ctx:,} (max)"
                 else:
                     ctx = f"{pref_ctx:,} (pref)"
+                row_tag = "idle"
 
             self.tree.insert(
-                "", tk.END, iid=key, values=(status, key, name, quant, size_str, ctx)
+                "", tk.END, iid=key, values=(status, key, name, quant, size_str, ctx),
+                tags=(row_tag,)
             )
 
         if llms:
