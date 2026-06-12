@@ -84,6 +84,11 @@ Or use `lmstudio.bat` (also suitable for a `shell:startup` shortcut to launch on
 pytest
 ```
 
+## Roadmap
+
+- [ ] **Prettier UI** — the control panel is functional but visually basic right now. Plan a UI
+  overhaul (improved layout, styling, and polish). This will be tracked as a new spec.
+
 ## More
 
 - [ARCHITECTURE.md](ARCHITECTURE.md) — modules, control flow, invariants, extension points.
