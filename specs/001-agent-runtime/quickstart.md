@@ -25,8 +25,9 @@ pip install fastapi uvicorn "mcp" tiktoken
 # plus a Windows toast library when wiring notifications
 ```
 
-> Note: [lmstudio.bat](lmstudio.bat) currently points at a stale path/venv (`LMStudioManager` +
-> `venv\`). Fix it to `LMStudioClaw` + `.venv\` when touching startup behavior (see [AGENTS.md](AGENTS.md)).
+> Note: [lmstudio.bat](lmstudio.bat) launches the controller windowless via the project venv
+> (`pythonw -m lmstudioclaw.cli`); it is path-independent and suitable for a `shell:startup`
+> shortcut (see [AGENTS.md](AGENTS.md)).
 
 ## First run
 

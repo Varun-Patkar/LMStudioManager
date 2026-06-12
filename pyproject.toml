@@ -1,5 +1,5 @@
 [project]
-name = "lmstudio-manager"
+name = "lmstudioclaw"
 version = "1.0.0"
 description = "Call-based, local agent runtime powered by LM Studio (tray controller + web UI)"
 requires-python = ">=3.12"

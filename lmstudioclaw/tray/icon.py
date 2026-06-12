@@ -56,7 +56,7 @@ class Tray:
             pystray.MenuItem("Quit", self._quit),
         )
         self._icon = pystray.Icon(
-            "lmstudioclaw", _build_icon_image(), "LM Studio Manager", menu
+            "lmstudioclaw", _build_icon_image(), "LMStudioClaw", menu
         )
         # ``setup`` runs once the icon is visible; we use it to auto-open the UI.
         self._icon.run(setup=self._on_ready)

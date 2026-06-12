@@ -1,4 +1,4 @@
-"""LM Studio Manager — call-based local agent runtime.
+"""LMStudioClaw — call-based local agent runtime.
 
 A resident controller (system tray + local web UI) that stays running while the PC
 is on with **no model loaded at idle**. On a manual session or a fired automation it

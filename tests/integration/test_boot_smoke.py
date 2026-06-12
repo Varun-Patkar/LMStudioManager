@@ -35,7 +35,7 @@ def test_controller_boots_and_serves(temp_app_paths):
         # The SPA index is served at the root.
         index = client.get("/")
         assert index.status_code == 200
-        assert "LM Studio Manager" in index.text
+        assert "LMStudioClaw" in index.text
 
         # No session is active at idle (SC-001 analogue: nothing running).
         assert client.get("/api/queue").json() == []

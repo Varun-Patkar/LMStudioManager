@@ -22,7 +22,7 @@ _STATIC_DIR = Path(__file__).resolve().parent / "static"
 
 def create_app(controller: Controller | None = None) -> FastAPI:
     """Create the FastAPI app, attaching a Controller to ``app.state``."""
-    app = FastAPI(title="LM Studio Manager", lifespan=lifespan)
+    app = FastAPI(title="LMStudioClaw", lifespan=lifespan)
     app.state.controller = controller or Controller()
 
     # REST routers (registered as each user story lands).

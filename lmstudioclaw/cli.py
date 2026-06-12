@@ -1,4 +1,4 @@
-"""Thin entry point for the LM Studio Manager controller.
+"""Thin entry point for the LMStudioClaw controller.
 
 Starts the resident controller: finds a free web port (with fallback if the preferred
 one is taken — FR-055), serves the FastAPI app via uvicorn on a **background thread**,

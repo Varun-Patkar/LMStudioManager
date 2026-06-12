@@ -19,7 +19,7 @@ _TITLES = {
     "automation_missed": "Automation missed",
     "run_completed": "Run completed",
     "run_failed": "Run failed",
-    "system": "LM Studio Manager",
+    "system": "LMStudioClaw",
 }
 
 
@@ -28,10 +28,10 @@ def notify(notification_type: str, message: str) -> None:
 
     ``message`` is assumed to be secret-free by the caller (FR-026).
     """
-    title = _TITLES.get(notification_type, "LM Studio Manager")
+    title = _TITLES.get(notification_type, "LMStudioClaw")
     if _win_notify is None:
         return
     try:
-        _win_notify(title, message, app_id="LM Studio Manager")
+        _win_notify(title, message, app_id="LMStudioClaw")
     except Exception:  # pragma: no cover - toast backends can fail in odd ways
         pass

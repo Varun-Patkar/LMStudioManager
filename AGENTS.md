@@ -1,6 +1,6 @@
 # AGENTS.md
 
-AI-agent guide for **LM Studio Manager** (v1.0.0) — a Windows tray controller + local web
+AI-agent guide for **LMStudioClaw** (v1.0.0) — a Windows tray controller + local web
 UI that runs a **call-based, LM Studio-powered agent**: no model at idle, load-run-unload
 per session/automation. See [README.md](README.md) for the human overview and
 [ARCHITECTURE.md](ARCHITECTURE.md) for module-level detail.
@@ -54,7 +54,7 @@ lmstudio                             # run the controller (entry point in pyproj
 pytest                               # unit + integration + contract tests under tests/
 ```
 
-- If the venv `pip` launcher errors with a stale `LMStudioManager` path, use `python -m pip`
+- If the venv `pip` launcher errors with a stale `LMStudioClaw` path, use `python -m pip`
   (and `python -m pytest`).
 - Connection settings: `lmstudioclaw/config/default.yaml` (`/v1` is stripped for the native API).
 

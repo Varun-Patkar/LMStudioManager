@@ -27,7 +27,7 @@ Templates requiring updates:
 Follow-up TODOs: Create ARCHITECTURE.md and reconcile AGENTS.md's Markdown-file rule.
 -->
 
-# LM Studio Manager Constitution
+# LMStudioClaw Constitution
 
 ## Core Principles
 

@@ -1,4 +1,4 @@
-# Architecture — LM Studio Manager (Call-Based Agent Runtime)
+# Architecture — LMStudioClaw (Call-Based Agent Runtime)
 
 This document describes the modules, data/control flow, integration points, invariants,
 and extension points of the agent runtime. See [README.md](README.md) for the
