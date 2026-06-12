@@ -4,6 +4,8 @@ description: "Task list for Call-Based LM Studio Agent Runtime implementation"
 
 # Tasks: Call-Based LM Studio Agent Runtime
 
+**Status**: ✅ Completed — all 70 tasks implemented; 45 tests passing.
+
 **Input**: Design documents from [specs/001-agent-runtime/](.)
 
 **Prerequisites**: [plan.md](plan.md), [spec.md](spec.md), [research.md](research.md),

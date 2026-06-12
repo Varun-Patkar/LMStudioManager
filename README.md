@@ -1,4 +1,4 @@
-# LM Studio Manager
+# LMStudioClaw
 
 A Windows desktop **agent runtime** powered by your local LM Studio models. A resident
 controller lives in the system tray and serves a local web control panel. It keeps **no

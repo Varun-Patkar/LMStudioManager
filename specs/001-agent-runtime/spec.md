@@ -4,7 +4,7 @@
 
 **Created**: 2026-06-12
 
-**Status**: Draft
+**Status**: Completed (all 70 implementation tasks done; 45 tests passing)
 
 **Input**: User description: "Turn the current LM Studio model loader/unloader into a call-based, LM Studio-powered agent (OpenClaw-style) that does NOT run forever. It is invoked on demand or by automations; once a task is done it unloads the model and stops. Users can set up automations that load the model with a notification when running (PC must be on; if it was off, on next startup inform the user it failed at xyz time). The agent has read/write access to a single default folder and can request access to other folders, granted per-session or forever. A Sessions page manages all this. MCP servers are addable, and a skills folder in Documents lets users add custom skills (Markdown SKILL.md, optionally with referenced scripts). Skills and MCPs/tools are usable by both automations and normal tasks. The model is not loaded by default — it loads only when an automation or task runs. There is a default model with options to select others. The existing model-management functionality lives in a separate Settings section (e.g. context length per model). Custom Python tools are allowed (treated as arbitrary code with a warning; a future reviewer should detect prompt injection or malicious code). The UI is a local web UI opened from the tray icon. Comprehensive app settings (theme dark/light/system, etc.) are expected."
 
