@@ -100,7 +100,7 @@ unconsented paths.
 
 ### Implementation for User Story 2
 
-- [ ] T022 [P] [US2] Implement `read_file` range support (`start_line`/`end_line`) and `grep`, `find`, plus move/extend the existing read/list/write handlers into `lmstudioclaw/capabilities/file_tools.py`, all routed through `PathGate` (FR-009/FR-012/FR-013/FR-015).
+- [ ] T022 [P] [US2] Implement `read_file` range support (`start_line`/`end_line`), `write_file` (create/overwrite, creating parent folders), and `grep`/`find`, plus move/extend the existing read/list/write handlers into `lmstudioclaw/capabilities/file_tools.py`, all routed through `PathGate` (FR-009/FR-011/FR-012/FR-013/FR-015).
 - [ ] T023 [P] [US2] Implement the overloaded `edit` tool (exact-string find/replace, unique-or-fail; line-range replace, bounds-checked; atomic temp-file write; consent-gated) in `lmstudioclaw/capabilities/file_tools.py` (FR-010, Edge Cases).
 - [ ] T024 [P] [US2] Implement the consent-gated `powershell` tool (workspace cwd, `-Command` single-arg, per-call timeout, truncated stdout/stderr, exit-code surfaced, `PathGate` for declared out-of-workspace paths) in `lmstudioclaw/capabilities/shell_tool.py` (FR-014/FR-015a).
 - [ ] T025 [US2] Implement the `parallel` meta-tool (`{calls:[{tool,arguments}]}`, len≥2, `asyncio.gather` dispatching each sub-call through `registry.invoke_tool` so consent/timeout apply; reject same-target write/edit pairs) in `lmstudioclaw/capabilities/parallel_tool.py` (clarification Q2).
@@ -131,7 +131,7 @@ restart app with items queued (queue restored).
 - [ ] T031 [US3] For an automation run, show the automation's definition alongside the session with an edit affordance (and keep it editable from the Automations list) in `lmstudioclaw/web/static/views/sessions.js` + `automations.js` (FR-022).
 - [ ] T032 [US3] Extend `GET /api/queue` snapshot items with `trigger_type` + `label` for the run/queue surface in `lmstudioclaw/web/routes_sessions.py` per [contracts/delta-api.md](contracts/delta-api.md) §3 (FR-023).
 - [ ] T033 [US3] Ensure firing automations enqueue through the same single-active queue and broadcast run/queue status in `lmstudioclaw/app.py` (`enqueue_automation`) + `lmstudioclaw/automations/scheduler.py` wiring (FR-018/FR-019/FR-024).
-- [ ] T034 [US3] On startup, restore the persisted queue and reconcile an interrupted in-progress run (resume/re-queue; record un-resumable manual turns) in `lmstudioclaw/app.py` startup + `lmstudioclaw/sessions/queue.py` (FR-025a, Edge Cases).
+- [ ] T034 [US3] On startup, restore the persisted queue (re-enqueue not-yet-started runs in FIFO order) and reconcile an interrupted in-progress run — re-queue where it can be safely restarted, else record as interrupted and surface it — in `lmstudioclaw/app.py` startup + `lmstudioclaw/sessions/queue.py` (FR-025a, Edge Cases).
 
 **Checkpoint**: Concurrency is enforced and fully visible; queue survives restart — US3 demoable.
 

@@ -148,11 +148,11 @@ When starting a session (including a follow-up that begins a new run) or creatin
 #### Default agent toolset
 
 - **FR-008**: A run's default toolset MUST include capabilities for: reading files, running PowerShell, precise in-place editing, writing/overwriting files, content search (grep), file-glob search (find), directory listing, and a parallel meta-tool that runs two or more independent sub-tool-calls concurrently. The toolset MUST be a single, consistently-named set that favors clear, descriptive tool names; existing descriptive names (read_file, list_dir, write_file) are reused where the tool already exists, and the remaining capabilities (edit, grep, find, powershell, parallel) are added with equally descriptive names.
-- **FR-009**: The **read** tool MUST be able to return a specific portion of a file (e.g., a line or byte range) in addition to the whole file.
+- **FR-009**: The **read** tool (`read_file`) MUST be able to return a specific portion of a file (e.g., a line range) in addition to the whole file.
 - **FR-010**: The **edit** tool MUST perform precise in-place edits, supporting two overloaded targeting modes: (a) **exact-string** find-and-replace — given the exact existing text and its replacement, it MUST replace it in place and MUST fail with a clear message if the target is not found or is not unique; and (b) **line-range** replace — given start/end line numbers and new content, it MUST replace exactly that range. Both modes MUST leave the rest of the file unchanged.
-- **FR-011**: The **write** tool MUST create or overwrite a file, creating parent folders as needed.
+- **FR-011**: The **write** tool (`write_file`) MUST create or overwrite a file, creating parent folders as needed.
 - **FR-012**: The **grep** tool MUST return matches for a text or pattern search across files, and the **find** tool MUST return file paths matching a glob.
-- **FR-013**: The **ls** tool MUST list the entries of a directory.
+- **FR-013**: The **ls** tool (`list_dir`) MUST list the entries of a directory.
 - **FR-014**: The **powershell** tool MUST run a PowerShell command and return its output, starting execution in the workspace folder, bounding execution time and output size and surfacing non-zero exit codes.
 - **FR-015**: All file-accessing tools (read, edit, write, grep, find, ls) MUST continue to route through the existing consent/path gate; access outside allowed/consented folders MUST be blocked with a clear message.
 - **FR-015a**: The **powershell** tool MUST be bound by the same consent model as the file tools: it operates freely within the workspace and any already-consented folders; the secrets store and app-internal areas MUST always be denied; and a command needing a path outside currently consented folders MUST raise the same consent prompt (session/permanent), with permanent grants persisted as user-consented folders in Settings.
@@ -169,7 +169,7 @@ When starting a session (including a follow-up that begins a new run) or creatin
 - **FR-023**: When the queue is non-empty, the UI MUST show a collapsible panel listing queued items in FIFO order with their type/label; when the queue is empty, the panel MUST be hidden.
 - **FR-024**: The run indicator and queue panel MUST update live as runs start, finish, and queue contents change.
 - **FR-025**: Users MUST be able to remove a queued item before it starts without affecting the active run.
-- **FR-025a**: The run queue MUST be persisted: queued manual sessions and automation runs, plus an interrupted in-progress run, MUST be saved and resumed on next app startup (continuing where they left off) so no queued work is silently lost on an app or PC restart.
+- **FR-025a**: The run queue MUST be persisted so no queued work is silently lost on an app or PC restart: queued (not-yet-started) manual sessions and automation runs MUST be saved and re-enqueued in FIFO order on next app startup. An interrupted in-progress run MUST be reconciled on startup — re-queued to run again where it can be safely restarted, or recorded as interrupted and surfaced to the user where its mid-turn state cannot be replayed; missed automation runs continue to use the scheduler's missed-run detection.
 
 #### Per-run configuration
 
@@ -199,7 +199,7 @@ When starting a session (including a follow-up that begins a new run) or creatin
 
 - **SC-001**: After clicking "Load model" or starting a run, the user sees the resulting status update without any manual page reload in 100% of attempts.
 - **SC-002**: On viewports from a narrow window to a wide monitor, the primary content area occupies approximately 90% of the viewport width (within a reasonable tolerance) and produces no horizontal scrollbar.
-- **SC-003**: A new evaluator rates each page of the UI as "professional/consistent" (clear layout, consistent components, no broken or unstyled elements) across all pages.
+- **SC-003**: A new evaluator rates each page of the UI as "professional/consistent" across all pages, evidenced by objective checks: no unstyled or visibly broken elements, consistent shared components (buttons/cards/tables/badges) and design tokens, and no horizontal scrollbar at any supported viewport width.
 - **SC-004**: In an agent run, all eight default tools (read, powershell, edit, write, grep, find, ls, parallel) can be invoked successfully, and a targeted edit changes only the intended section of a file in 100% of test cases.
 - **SC-005**: Across concurrent start attempts, exactly one run is active at any moment and additional requests appear in the queue in FIFO order in 100% of observations.
 - **SC-006**: The top-right run indicator reflects the true active-run state, and the queue panel appears only when items are waiting, in 100% of observed transitions.
