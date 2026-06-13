@@ -82,11 +82,11 @@ export default function SessionDetail() {
       switch (evt.type) {
         case "turn":
           if (evt.state === "start") { streamingId.current = null; setGen(true); }
-          else { streamingId.current = null; setGen(false); }
+          else { streamingId.current = null; finalizeStreaming(); setGen(false); }
           break;
         case "status":
           setStatus(evt.status);
-          if (TERMINAL.includes(evt.status)) { setEnded(true); setGen(false); toast(`Session ${evt.status}.`); }
+          if (TERMINAL.includes(evt.status)) { setEnded(true); setGen(false); finalizeStreaming(); toast(`Session ${evt.status}.`); }
           break;
         case "token":
           setMessages((ms) => {
