@@ -76,6 +76,25 @@ def add_server_to_config(mcp_json: Path, entry: dict) -> None:
         pass
 
 
+def remove_server_from_config(mcp_json: Path, name: str) -> bool:
+    """Remove a server entry from ``mcp.json`` by name. Returns True if it existed."""
+    if not mcp_json.exists():
+        return False
+    try:
+        data = json.loads(mcp_json.read_text(encoding="utf-8")) or {}
+    except (OSError, json.JSONDecodeError):
+        return False
+    servers = data.get("mcpServers", {})
+    if not isinstance(servers, dict) or name not in servers:
+        return False
+    servers.pop(name, None)
+    try:
+        mcp_json.write_text(json.dumps(data, indent=2), encoding="utf-8")
+    except OSError:
+        return False
+    return True
+
+
 def _run_isolated(coro_factory):
     """Run an async coroutine in a fresh thread with its own event loop.
 

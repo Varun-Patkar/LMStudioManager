@@ -146,7 +146,11 @@ class PersonaIn(BaseModel):
 @router.post("/api/personas")
 async def create_persona(payload: PersonaIn, request: Request) -> dict:
     """Create a new persona."""
-    pid = _ctrl(request).store.create_persona(payload.name, payload.instructions)
+    if not payload.name.strip():
+        raise HTTPException(422, "Persona name is required.")
+    if not payload.instructions.strip():
+        raise HTTPException(422, "Persona instructions are required.")
+    pid = _ctrl(request).store.create_persona(payload.name.strip(), payload.instructions.strip())
     return {"id": pid}
 
 

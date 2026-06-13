@@ -32,7 +32,13 @@ export default function Automations() {
   const toggleDay = (i) => set({ daily_days: form.daily_days.includes(i) ? form.daily_days.filter((d) => d !== i) : [...form.daily_days, i] });
 
   const create = async () => {
-    const body = { ...form, persona_id: form.persona_id || null, run_config: runCfg };
+    if (!form.name.trim()) return toast("Automation name is required.");
+    if (!form.task.trim()) return toast("Task / instruction is required.");
+    if (form.schedule_type === "daily" && form.daily_days.length === 0)
+      return toast("Pick at least one day for a daily schedule.");
+    if (form.schedule_type === "interval" && !(form.interval_value > 0))
+      return toast("Interval value must be greater than 0.");
+    const body = { ...form, name: form.name.trim(), task: form.task.trim(), persona_id: form.persona_id || null, run_config: runCfg };
     if (form.schedule_type === "daily") { delete body.interval_unit; delete body.interval_value; }
     else { delete body.daily_days; delete body.daily_time; }
     try { await post("/api/automations", body); toast("Automation created."); load(); }

@@ -230,6 +230,16 @@ class CapabilityRegistry:
             "description": f"MCP server '{entry['name']}'",
         })
 
+    def remove_mcp_server(self, name: str) -> bool:
+        """Remove an MCP server from ``mcp.json`` and its capability row. Returns success."""
+        from .mcp_client import remove_server_from_config
+
+        removed = remove_server_from_config(self._paths.mcp_json, name)
+        cap = self._store.get_capability_by_kind_name("mcp", name)
+        if cap:
+            self._store.delete_capability(cap["id"])
+        return removed or bool(cap)
+
     def register_tool(self, spec: ToolSpec) -> None:
         """Register an external tool (custom python / MCP) by name."""
         self._extra_tools[spec.name] = spec

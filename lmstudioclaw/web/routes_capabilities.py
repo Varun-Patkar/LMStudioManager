@@ -99,10 +99,31 @@ class McpIn(BaseModel):
 async def add_mcp(payload: McpIn, request: Request) -> dict:
     """Add an MCP server entry (secret values come only via the secrets endpoint)."""
     ctrl = _ctrl(request)
+    name = (payload.name or "").strip()
+    if not name:
+        raise HTTPException(422, "Server name is required.")
+    if not (payload.command or payload.url):
+        raise HTTPException(422, "Provide a command (stdio) or a URL for the MCP server.")
+    if ctrl.store.get_capability_by_kind_name("mcp", name):
+        raise HTTPException(409, f"An MCP server named '{name}' already exists.")
     add = getattr(ctrl.registry, "add_mcp_server", None)
     if not callable(add):
         raise HTTPException(501, "MCP support not available")
-    add(payload.model_dump(exclude_none=True))
+    entry = payload.model_dump(exclude_none=True)
+    entry["name"] = name
+    add(entry)
+    return {"ok": True}
+
+
+@router.delete("/api/capabilities/mcp/{name}")
+async def delete_mcp(name: str, request: Request) -> dict:
+    """Remove an MCP server from ``mcp.json`` and drop its capability row."""
+    ctrl = _ctrl(request)
+    remove = getattr(ctrl.registry, "remove_mcp_server", None)
+    if not callable(remove):
+        raise HTTPException(501, "MCP support not available")
+    if not remove(name):
+        raise HTTPException(404, "MCP server not found")
     return {"ok": True}
 
 
@@ -124,6 +145,10 @@ class SecretIn(BaseModel):
 @router.put("/api/secrets/{ref_name}")
 async def set_secret(ref_name: str, payload: SecretIn, request: Request) -> dict:
     """Set/replace a secret value (write-only; stored in the isolated vault, FR-078)."""
+    if not ref_name.strip():
+        raise HTTPException(422, "A reference name is required.")
+    if not payload.value:
+        raise HTTPException(422, "A secret value is required.")
     _ctrl(request).vault.set(ref_name, payload.value, owner=payload.owner)
     return {"ok": True}
 

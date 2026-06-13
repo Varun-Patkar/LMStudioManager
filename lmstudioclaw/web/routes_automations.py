@@ -43,6 +43,10 @@ async def create_automation(payload: AutomationIn, request: Request) -> dict:
     """Create an automation and compute its next fire time."""
     ctrl = _ctrl(request)
     data = payload.model_dump()
+    if not data["name"].strip():
+        raise HTTPException(422, "Automation name is required.")
+    if not data["task"].strip():
+        raise HTTPException(422, "Task / instruction is required.")
     _validate_schedule(data)
     aid = ctrl.store.create_automation(data)
     if ctrl.scheduler is not None:

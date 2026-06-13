@@ -104,6 +104,13 @@ def _run() -> None:
     server.should_exit = True
     server_thread.join(timeout=10)
 
+    # Force the process to terminate so no lingering daemon thread (uvicorn, scheduler)
+    # keeps ``pythonw`` alive and holding the web port. The graceful shutdown above has
+    # already unloaded the model and stopped the queue/scheduler via the lifespan.
+    import os
+
+    os._exit(0)
+
 
 def cli() -> None:
     """Entry point for the ``lmstudio`` console script."""

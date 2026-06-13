@@ -527,6 +527,16 @@ class Store:
             r["secret_refs"] = json.loads(r["secret_refs"]) if r.get("secret_refs") else []
         return r
 
+    def get_capability_by_kind_name(self, kind: str, name: str) -> dict[str, Any] | None:
+        """Return a capability row by (kind, name), or None."""
+        return self._query_one(
+            "SELECT * FROM capabilities WHERE kind=? AND name=?", (kind, name)
+        )
+
+    def delete_capability(self, cap_id: str) -> None:
+        """Remove a capability row by id (best-effort)."""
+        self._exec("DELETE FROM capabilities WHERE id=?", (cap_id,))
+
     def update_capability(self, cap_id: str, **fields: Any) -> None:
         """Patch a capability's enabled/trust/status fields."""
         for bool_field in ("enabled", "trust_confirmed"):

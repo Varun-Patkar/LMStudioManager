@@ -99,8 +99,9 @@ function Personas({ personas, reload }) {
         <input placeholder="New persona name" value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} />
         <textarea placeholder="Instructions" value={draft.instructions} onChange={(e) => setDraft({ ...draft, instructions: e.target.value })} />
         <button className="btn green" onClick={async () => {
-          if (!draft.name.trim()) return;
-          try { await post("/api/personas", { name: draft.name.trim(), instructions: draft.instructions }); setDraft({ name: "", instructions: "" }); reload(); }
+          if (!draft.name.trim()) return toast("Persona name is required.");
+          if (!draft.instructions.trim()) return toast("Persona instructions are required.");
+          try { await post("/api/personas", { name: draft.name.trim(), instructions: draft.instructions.trim() }); setDraft({ name: "", instructions: "" }); reload(); }
           catch (e) { toast(e.message); }
         }}>Create persona</button>
       </div>

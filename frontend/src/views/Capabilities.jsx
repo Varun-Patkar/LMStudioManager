@@ -33,6 +33,7 @@ export default function Capabilities() {
         <div className="row">
           {c.kind === "tool" && !c.trust_confirmed && <button className="btn amber" onClick={() => trust(c)}>Confirm trust</button>}
           {(c.status === "valid" || c.status === "disabled") && <button className="btn ghost" onClick={() => toggle(c)}>{c.enabled ? "Disable" : "Enable"}</button>}
+          {c.kind === "mcp" && <button className="btn red" onClick={() => delMcp(c.name)}>Delete</button>}
         </div>
       </td>
     </tr>
@@ -46,17 +47,27 @@ export default function Capabilities() {
   ) : <p className="muted">{empty}</p>;
 
   const addMcp = async () => {
+    const name = mcp.name.trim();
+    if (!name) return toast("Server name is required.");
+    if (!mcp.command.trim() && !mcp.url.trim()) return toast("Provide a command (stdio) or a URL.");
     try {
       await post("/api/capabilities/mcp", {
-        name: mcp.name.trim(), command: mcp.command.trim() || null,
+        name, command: mcp.command.trim() || null,
         args: mcp.args.trim() ? mcp.args.trim().split(/\s+/) : null, url: mcp.url.trim() || null,
       });
       setMcp({ name: "", command: "", args: "", url: "" }); load();
     } catch (e) { toast(e.message); }
   };
+  const delMcp = async (name) => {
+    if (!confirm(`Delete MCP server “${name}”?`)) return;
+    try { await del(`/api/capabilities/mcp/${encodeURIComponent(name)}`); toast("MCP server deleted."); load(); }
+    catch (e) { toast(e.message); }
+  };
   const saveSecret = async () => {
-    if (!secret.ref.trim()) return;
-    try { await api("PUT", `/api/secrets/${encodeURIComponent(secret.ref.trim())}`, { value: secret.value }); setSecret({ ref: "", value: "" }); load(); }
+    const ref = secret.ref.trim();
+    if (!ref) return toast("A reference name is required.");
+    if (!secret.value) return toast("A secret value is required.");
+    try { await api("PUT", `/api/secrets/${encodeURIComponent(ref)}`, { value: secret.value }); setSecret({ ref: "", value: "" }); load(); }
     catch (e) { toast(e.message); }
   };
   const delSecret = async (name) => { try { await del(`/api/secrets/${encodeURIComponent(name)}`); load(); } catch (e) { toast(e.message); } };
