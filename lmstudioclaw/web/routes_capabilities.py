@@ -124,6 +124,10 @@ async def delete_mcp(name: str, request: Request) -> dict:
         raise HTTPException(501, "MCP support not available")
     if not remove(name):
         raise HTTPException(404, "MCP server not found")
+    # Re-scan so the DB, mcp.json, and in-memory registry are fully reconciled.
+    discover = getattr(ctrl.registry, "discover", None)
+    if callable(discover):
+        await _maybe_async(discover)
     return {"ok": True}
 
 

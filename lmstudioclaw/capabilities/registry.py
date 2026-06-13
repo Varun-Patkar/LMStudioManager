@@ -183,10 +183,21 @@ class CapabilityRegistry:
         return ToolSpec(mod.name, mod.description or mod.name, mod.parameters, _handler)
 
     def _scan_mcp(self) -> None:
-        """Connect enabled MCP servers and register their tools (FR-013/FR-017)."""
+        """Connect enabled MCP servers and register their tools (FR-013/FR-017).
+
+        Also **prunes** capability rows for MCP servers no longer present in
+        ``mcp.json`` so manual edits (or deletions) stay in sync with the UI.
+        """
         from .mcp_client import list_tools, read_mcp_config
 
-        for server in read_mcp_config(self._paths.mcp_json):
+        servers = read_mcp_config(self._paths.mcp_json)
+        present = {s.name for s in servers}
+        # Drop DB rows for MCP servers that have been removed from mcp.json.
+        for row in self._store.list_capabilities(kind="mcp"):
+            if row["name"] not in present:
+                self._store.delete_capability(row["id"])
+
+        for server in servers:
             cap_id = self._store.upsert_capability({
                 "kind": "mcp", "name": server.name, "source_path": None,
                 "description": f"MCP server '{server.name}'",

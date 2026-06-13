@@ -69,6 +69,27 @@ def test_add_mcp_server_writes_config_and_row(temp_app_paths):
     assert any(c["name"] == "files" and c["kind"] == "mcp" for c in store.list_capabilities("mcp"))
 
 
+def test_remove_mcp_server_clears_config_and_row(temp_app_paths):
+    registry, store = _registry(temp_app_paths)
+    registry.add_mcp_server({"name": "files", "command": "npx", "args": ["-y", "server"]})
+    # Remove via the API path: clears both mcp.json and the capability row.
+    assert registry.remove_mcp_server("files") is True
+    config = json.loads(temp_app_paths.mcp_json.read_text(encoding="utf-8"))
+    assert "files" not in config["mcpServers"]
+    assert not any(c["name"] == "files" for c in store.list_capabilities("mcp"))
+
+
+def test_manual_mcp_removal_pruned_on_rescan(temp_app_paths):
+    """Editing mcp.json by hand to drop a server prunes its stale DB row on rescan."""
+    registry, store = _registry(temp_app_paths)
+    registry.add_mcp_server({"name": "files", "command": "npx", "args": ["-y", "server"]})
+    assert any(c["name"] == "files" for c in store.list_capabilities("mcp"))
+    # Simulate a manual edit that empties mcp.json.
+    temp_app_paths.mcp_json.write_text('{\n  "mcpServers": {}\n}\n', encoding="utf-8")
+    registry.discover()
+    assert not any(c["name"] == "files" for c in store.list_capabilities("mcp"))
+
+
 def test_secret_isolated_from_agent(temp_app_paths):
     vault = SecretsVault(temp_app_paths.secrets_dir)
     vault.set("api_key", "super-secret", owner="mcp")
